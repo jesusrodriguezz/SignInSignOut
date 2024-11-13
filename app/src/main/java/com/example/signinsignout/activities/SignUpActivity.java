@@ -22,6 +22,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.signinsignout.R;
 import com.example.signinsignout.databinding.ActivitySignUpBinding;
 import com.example.signinsignout.utilities.Constants;
+import com.example.signinsignout.utilities.PreferenceManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.ByteArrayInputStream;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 public class SignUpActivity extends AppCompatActivity {
 
     private ActivitySignUpBinding binding;
+    private com.example.signinsignout.utilities.PreferenceManager preferenceManager;
 
     private String encodeImage;
 
@@ -48,6 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
 //        });
         binding = ActivitySignUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        preferenceManager = new PreferenceManager(getApplicationContext());
         setListeners();
 
     }
@@ -90,9 +93,19 @@ public class SignUpActivity extends AppCompatActivity {
         database.collection(Constants.KEY_COLLECTION_USERS)
                 .add(user)
                 .addOnSuccessListener(documentReference -> {
+                    loading(false);
+
+                    preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+                    preferenceManager.putString(Constants.KEY_NAME, binding.inputName.getText().toString());
+                    preferenceManager.putString(Constants.KEY_IMAGE,encodeImage);
+
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
 
                 }).addOnFailureListener(exception -> {
-                    Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                    loading(false);
+                    showToast(exception.getMessage());
                 });
 
     }
@@ -134,6 +147,10 @@ public class SignUpActivity extends AppCompatActivity {
     );
 
     private Boolean isValidateSignUpDetails(){
+        if (encodeImage == null){
+            showToast("Please Select your Image");
+            return false;
+        }
         if (binding.inputName.getText().toString().trim().isEmpty()){
             showToast("Please Enter your Name");
             return false;
