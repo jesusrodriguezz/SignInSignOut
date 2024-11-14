@@ -6,7 +6,8 @@
     <string name="create_new_account">Create New Account</string>
     <string name="create_new_account1">Create New Account</string>
     <string name="add_image">Add Image</string>
-    <string name="name">Name</string>
+    <string name="name">First Name</string>
+    <string name="last_name">Last Name</string>
     <string name="password">password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="sign_in">Sign In</string>
